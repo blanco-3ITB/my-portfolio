@@ -335,10 +335,10 @@ function Projects() {
   return (
     <section id="projects">
       <div className="container">
-        <p className="section-label reveal">Things I've built</p>
-        <h2 className="section-title reveal reveal-delay-1">Projects</h2>
+        <p className="section-label">Things I've built</p>
+        <h2 className="section-title">Projects</h2>
 
-        <div className="projects__filters reveal reveal-delay-1" role="group" aria-label="Project filter">
+        <div className="projects__filters" role="group" aria-label="Project filter">
           {['featured', 'all'].map((f) => (
             <button
               key={f}
