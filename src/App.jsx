@@ -1,19 +1,41 @@
-import { useEffect, useRef, useState, useCallback } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import { personalInfo, skills, projects, experience, education, navLinks } from './data'
 import myPic from './assets/mypic.jfif'
+import {
+  IconGithub, IconLinkedin, IconFacebook, IconMail, IconArrowUpRight,
+  IconMapPin, IconBriefcase, IconCode, IconGraduationCap,
+  IconUsers, IconHospital, IconCoffee, IconCheckSquare, IconShoppingCart,
+} from './Icons'
 import './App.css'
 
+const projectIconMap = {
+  users:    <IconUsers       width={22} height={22} />,
+  hospital: <IconHospital    width={22} height={22} />,
+  coffee:   <IconCoffee      width={22} height={22} />,
+  check:    <IconCheckSquare width={22} height={22} />,
+  cart:     <IconShoppingCart width={22} height={22} />,
+}
+
 /* ── Scroll-reveal hook ── */
-function useReveal() {
-  useEffect(() => {
-    const els = document.querySelectorAll('.reveal')
-    const io = new IntersectionObserver(
+let revealObserver = null
+function getRevealObserver() {
+  if (!revealObserver) {
+    revealObserver = new IntersectionObserver(
       (entries) => entries.forEach((e) => e.isIntersecting && e.target.classList.add('visible')),
-      { threshold: 0.12 }
+      { threshold: 0.1, rootMargin: '0px 0px -40px 0px' }
     )
+  }
+  return revealObserver
+}
+
+function useReveal(containerRef) {
+  useEffect(() => {
+    const root = containerRef?.current || document
+    const els = root.querySelectorAll('.reveal:not(.visible)')
+    const io = getRevealObserver()
     els.forEach((el) => io.observe(el))
-    return () => io.disconnect()
-  }, [])
+    return () => els.forEach((el) => io.unobserve(el))
+  }, [containerRef])
 }
 
 /* ── Custom Cursor ── */
@@ -31,7 +53,6 @@ function Cursor() {
         dot.current.style.top = e.clientY + 'px'
       }
     }
-    // ring follows with slight lag via rAF
     const tick = () => {
       if (ring.current) {
         ring.current.style.left = pos.current.x + 'px'
@@ -86,7 +107,7 @@ function Navbar() {
     <nav className={`navbar${scrolled ? ' navbar--scrolled' : ''}`} role="navigation" aria-label="Main navigation">
       <div className="container navbar__inner">
         <span className="navbar__logo gradient-text" aria-label={personalInfo.name}>
-          {personalInfo.name.split(' ')[0]}<span style={{ color: 'var(--accent-2)' }}>.</span>
+          {personalInfo.name.split(' ')[0]}<span style={{ color: 'var(--accent)' }}>.</span>
         </span>
         <ul className="navbar__links">
           {navLinks.map((l) => (
@@ -100,7 +121,9 @@ function Navbar() {
             </li>
           ))}
         </ul>
-        <a href={personalInfo.resume} className="btn btn-outline navbar__cta">Resume ↗</a>
+        <a href={personalInfo.resume} className="btn btn-outline navbar__cta">
+          Resume <IconArrowUpRight className="icon-sm" />
+        </a>
       </div>
     </nav>
   )
@@ -112,34 +135,52 @@ function Hero() {
     <section id="hero">
       <div className="container hero__inner">
         <div className="hero__content">
-          <div className="hero__badge" role="status">
-            <span className="hero__badge-dot" aria-hidden="true" />
+          <div className="hero__eyebrow" role="status">
+            <span className="hero__eyebrow-dot" aria-hidden="true" />
             Available for work
           </div>
 
-          <h1 className="hero__name">
-            Hi, I'm{' '}
-            <span className="gradient-text">{personalInfo.name}</span>
-          </h1>
+          <div className="win hero__terminal">
+            <div className="win__bar">
+              <span className="win__dots" aria-hidden="true"><i /><i /><i /></span>
+              <span className="win__title">~/{personalInfo.name.split(' ')[0].toLowerCase()} — intro.sh</span>
+            </div>
+            <div className="win__body">
+              <p className="term-line">
+                <span className="term-prompt">$</span> whoami
+              </p>
 
-          <p className="hero__title">
-            <span>{'< '}</span>{personalInfo.title}<span>{' />'}</span>
-          </p>
+              <h1 className="hero__name">
+                Hi, I'm{' '}
+                <span className="gradient-text">{personalInfo.name}</span>
+              </h1>
 
-          <p className="hero__bio">{personalInfo.bio}</p>
+              <p className="hero__title">
+                <span className="token-comment">// </span>{personalInfo.title}
+              </p>
 
-          <div className="hero__actions">
-            <a href="#projects" className="btn btn-primary">View My Work</a>
-            <a href="#contact" className="btn btn-outline">Get in Touch</a>
+              <p className="hero__bio">{personalInfo.bio}</p>
+
+              <div className="hero__actions">
+                <a href="#projects" className="btn btn-primary">
+                  View My Work <IconArrowUpRight className="icon-sm" />
+                </a>
+                <a href="#contact" className="btn btn-outline">Get in Touch</a>
+              </div>
+
+              <nav className="hero__social" aria-label="Social links">
+                <a href={personalInfo.github} target="_blank" rel="noreferrer">
+                  <IconGithub className="icon-sm" /> GitHub
+                </a>
+                <a href={personalInfo.linkedin} target="_blank" rel="noreferrer">
+                  <IconLinkedin className="icon-sm" /> LinkedIn
+                </a>
+                <a href={personalInfo.facebook} target="_blank" rel="noreferrer">
+                  <IconFacebook className="icon-sm" /> Facebook
+                </a>
+              </nav>
+            </div>
           </div>
-
-          <nav className="hero__social" aria-label="Social links">
-            <a href={personalInfo.github} target="_blank" rel="noreferrer">GitHub</a>
-            <span className="hero__social-sep" aria-hidden="true">/</span>
-            <a href={personalInfo.linkedin} target="_blank" rel="noreferrer">LinkedIn</a>
-            <span className="hero__social-sep" aria-hidden="true">/</span>
-            <a href={personalInfo.facebook} target="_blank" rel="noreferrer">Facebook</a>
-          </nav>
         </div>
 
         <div className="hero__avatar-wrap">
@@ -148,6 +189,10 @@ function Hero() {
             alt={`${personalInfo.name} profile photo`}
             className="hero__avatar"
           />
+          <span className="hero__avatar-badge">
+            <span className="hero__avatar-badge-dot" aria-hidden="true" />
+            Available
+          </span>
         </div>
       </div>
     </section>
@@ -156,9 +201,10 @@ function Hero() {
 
 /* ── About ── */
 function About() {
-  useReveal()
+  const ref = useRef(null)
+  useReveal(ref)
   return (
-    <section id="about">
+    <section id="about" ref={ref}>
       <div className="container">
         <p className="section-label reveal">About me</p>
         <h2 className="section-title reveal reveal-delay-1">Who I am</h2>
@@ -166,18 +212,29 @@ function About() {
           <div className="about__text reveal reveal-delay-1">
             <p>{personalInfo.bio}</p>
             <ul className="about__meta">
-              <li><span>Location</span>{personalInfo.location}</li>
-              <li><span>Email</span>
+              <li>
+                <IconMapPin className="icon-sm" />
+                <span>Location</span>{personalInfo.location}
+              </li>
+              <li>
+                <IconMail className="icon-sm" />
+                <span>Email</span>
                 <a href={`mailto:${personalInfo.email}`}>{personalInfo.email}</a>
               </li>
-              <li><span>Status</span>Open to opportunities</li>
+              <li>
+                <IconBriefcase className="icon-sm" />
+                <span>Status</span>Open to opportunities
+              </li>
             </ul>
           </div>
 
           <div className="glass-card about__edu reveal reveal-delay-2">
             {education.map((e) => (
               <div className="about__edu-item" key={e.id}>
-                <p className="section-label">{e.degree ? 'Degree' : 'Strand'}</p>
+                <p className="section-label" style={{ gap: 6 }}>
+                  <IconGraduationCap className="icon-sm" />
+                  {e.degree ? 'Degree' : 'Strand'}
+                </p>
                 <h3>{e.degree || e.Strand}</h3>
                 <p>{e.school}</p>
                 <p>{e.location}</p>
@@ -241,7 +298,10 @@ function Skills() {
         <div className="skills__grid">
           {grouped.map(({ cat, items }, gi) => (
             <div key={cat} className={`glass-card skills__group reveal reveal-delay-${Math.min(gi + 1, 3)}`}>
-              <h3 className="skills__cat">{cat}</h3>
+              <h3 className="skills__cat">
+                <IconCode className="icon-sm" />
+                {cat}
+              </h3>
               <ul className="skills__list">
                 {items.map((s) => (
                   <li key={s.name}>
@@ -268,6 +328,8 @@ function Skills() {
 
 /* ── Projects ── */
 function Projects() {
+  const ref = useRef(null)
+  useReveal(ref)
   const [filter, setFilter] = useState('featured')
   const filtered = filter === 'all' ? projects : projects.filter((p) => p.featured)
 
@@ -290,21 +352,25 @@ function Projects() {
           ))}
         </div>
 
-        <div className="projects__grid">
+        <div className="projects__grid" ref={ref}>
           {filtered.map((p, i) => (
             <article
               key={p.id}
               className="glass-card project-card"
             >
-              <span className="project-card__num">
-                {String(i + 1).padStart(2, '0')}
-              </span>
+              <div className="project-card__icon">
+                {projectIconMap[p.icon]}
+              </div>
               <div className="project-card__header">
                 <h3>{p.title}</h3>
                 <div className="project-card__links">
-                  <a href={p.github} target="_blank" rel="noreferrer" aria-label={`${p.title} source code`} title="Source Code">↗</a>
+                  <a href={p.github} target="_blank" rel="noreferrer" aria-label={`${p.title} source code`} title="Source Code">
+                    <IconGithub className="icon-sm" />
+                  </a>
                   {p.live && (
-                    <a href={p.live} target="_blank" rel="noreferrer" aria-label={`${p.title} live demo`} title="Live Demo">⬡</a>
+                    <a href={p.live} target="_blank" rel="noreferrer" aria-label={`${p.title} live demo`} title="Live Demo">
+                      <IconArrowUpRight className="icon-sm" />
+                    </a>
                   )}
                 </div>
               </div>
@@ -322,6 +388,8 @@ function Projects() {
 
 /* ── Experience ── */
 function Experience() {
+  const ref = useRef(null)
+  useReveal(ref)
   const fmt = (dateStr) => {
     if (!dateStr) return 'Present'
     return dateStr.split('-')[0]
@@ -332,14 +400,17 @@ function Experience() {
       <div className="container">
         <p className="section-label reveal">Where I've worked</p>
         <h2 className="section-title reveal reveal-delay-1">Experience</h2>
-        <div className="timeline">
+        <div className="timeline" ref={ref}>
           {experience.map((e, i) => (
             <div key={e.id} className={`timeline__item glass-card reveal reveal-delay-${Math.min(i + 1, 3)}`}>
               <div className="timeline__meta">
                 <span className="timeline__date">
                   {e.start ? `${fmt(e.start)} — ${fmt(e.end)}` : fmt(e.end)}
                 </span>
-                <span className="timeline__type">{e.type}</span>
+                <span className="timeline__type">
+                  <IconBriefcase className="icon-sm" />
+                  {e.type}
+                </span>
               </div>
               <h3>{e.role}</h3>
               <p className="timeline__company">{e.company} · {e.location}</p>
@@ -357,8 +428,10 @@ function Experience() {
 
 /* ── Contact ── */
 function Contact() {
+  const ref = useRef(null)
+  useReveal(ref)
   return (
-    <section id="contact">
+    <section id="contact" ref={ref}>
       <div className="container contact__inner">
         <p className="section-label reveal">Get in touch</p>
         <h2 className="contact__title gradient-text reveal reveal-delay-1">
@@ -368,12 +441,18 @@ function Contact() {
           Open to new opportunities, collaborations, or just a good conversation about tech. My inbox is always open.
         </p>
         <a href={`mailto:${personalInfo.email}`} className="btn btn-primary reveal reveal-delay-2">
-          Say Hello →
+          <IconMail className="icon-sm" /> Say Hello
         </a>
         <nav className="contact__links reveal reveal-delay-3" aria-label="Social links">
-          <a href={personalInfo.github} target="_blank" rel="noreferrer" className="contact__link">GitHub ↗</a>
-          <a href={personalInfo.linkedin} target="_blank" rel="noreferrer" className="contact__link">LinkedIn ↗</a>
-          <a href={personalInfo.facebook} target="_blank" rel="noreferrer" className="contact__link">Facebook ↗</a>
+          <a href={personalInfo.github} target="_blank" rel="noreferrer" className="contact__link">
+            <IconGithub className="icon-sm" /> GitHub
+          </a>
+          <a href={personalInfo.linkedin} target="_blank" rel="noreferrer" className="contact__link">
+            <IconLinkedin className="icon-sm" /> LinkedIn
+          </a>
+          <a href={personalInfo.facebook} target="_blank" rel="noreferrer" className="contact__link">
+            <IconFacebook className="icon-sm" /> Facebook
+          </a>
         </nav>
       </div>
     </section>

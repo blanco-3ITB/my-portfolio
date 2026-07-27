@@ -36,6 +36,7 @@ export const projects = [
   {
     id: 1,
     title: "CCS Profiling",
+    icon: "users",
     description:
       "A web-based system that centralizes the management of student, faculty, and academic records for the College of Computer Studies. It provides secure profile management, efficient data organization, and quick access to information for improved administrative processes.",
     tech: ["React", "Node.js", "MySQL"],
@@ -46,6 +47,7 @@ export const projects = [
   {
     id: 2,
     title: "Clinic System",
+    icon: "hospital",
     description:
       "A clinic system designed to manage patient information, appointments, and medical records through a centralized and user-friendly platform. The system helps healthcare staff organize patient data, monitor appointments, and improve the efficiency of daily clinic operations. It provides a secure and accessible way to maintain accurate records and deliver better service to patients.",
     tech: ["HTML", "CSS", "Bootstrap","Javascript", "PHP", "MySQL"],
@@ -56,6 +58,7 @@ export const projects = [
   {
     id: 3,
     title: "Coffe Shop",
+    icon: "coffee",
     description:
       "A coffee shop discovery and booking website that showcases different coffee shops around Cabuyao, including their locations, details, and available services. The platform allows users to explore nearby coffee shops, view information about each location, and book appointments or reservations conveniently online.",
     tech: ["HTML", "CCS", "Javascript"],
@@ -67,6 +70,7 @@ export const projects = [
   {
     id: 4,
     title: "Task Management",
+    icon: "check",
     description:
       "Task management is the process of planning, organizing, prioritizing, and tracking tasks to ensure work is completed efficiently and on time. It helps individuals and teams stay organized, improve productivity, meet deadlines, and achieve goals by managing responsibilities effectively.",
     tech: ["HTML", "CSS", "Javascript", "PHP", "MySQL"],
@@ -77,6 +81,7 @@ export const projects = [
   {
     id: 5,
     title: "Ecommerce System",
+    icon: "cart",
     description:
       "Ecommerce system designed to provide a complete online shopping experience for both customers and administrators. The system includes features such as product management, user registration and authentication, shopping cart functionality, secure checkout, order tracking, inventory management, and payment processing. It streamlines the buying and selling process by automating key business operations, improving efficiency, and providing a user-friendly platform for managing online transactions.",
     tech: ["laravel", "TypeScript", "MySQL"],
