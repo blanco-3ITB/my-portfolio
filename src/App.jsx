@@ -17,24 +17,23 @@ const projectIconMap = {
 }
 
 /* ── Scroll-reveal hook ── */
-let revealObserver = null
-function getRevealObserver() {
-  if (!revealObserver) {
-    revealObserver = new IntersectionObserver(
-      (entries) => entries.forEach((e) => e.isIntersecting && e.target.classList.add('visible')),
-      { threshold: 0.1, rootMargin: '0px 0px -40px 0px' }
-    )
-  }
-  return revealObserver
-}
-
 function useReveal(containerRef) {
   useEffect(() => {
-    const root = containerRef?.current || document
-    const els = root.querySelectorAll('.reveal:not(.visible)')
-    const io = getRevealObserver()
+    const el = containerRef?.current
+    if (!el) return
+    const els = el.querySelectorAll('.reveal')
+    if (!els.length) return
+    const io = new IntersectionObserver(
+      (entries) => entries.forEach((e) => {
+        if (e.isIntersecting) {
+          e.target.classList.add('visible')
+          io.unobserve(e.target)
+        }
+      }),
+      { threshold: 0.08, rootMargin: '0px 0px -20px 0px' }
+    )
     els.forEach((el) => io.observe(el))
-    return () => els.forEach((el) => io.unobserve(el))
+    return () => io.disconnect()
   }, [containerRef])
 }
 
@@ -256,15 +255,13 @@ function Skills() {
   const [animated, setAnimated] = useState(false)
   const sectionRef = useRef(null)
 
-  useReveal(sectionRef)
-
   useEffect(() => {
-    const io = new IntersectionObserver(
-      ([e]) => { if (e.isIntersecting) setAnimated(true) },
-      { threshold: 0.1 }
+    const observer = new IntersectionObserver(
+      ([entry]) => { if (entry.isIntersecting) setAnimated(true) },
+      { threshold: 0.05 }
     )
-    if (sectionRef.current) io.observe(sectionRef.current)
-    return () => io.disconnect()
+    if (sectionRef.current) observer.observe(sectionRef.current)
+    return () => observer.disconnect()
   }, [])
 
   const tabs = ['All', ...categories]
@@ -298,7 +295,7 @@ function Skills() {
         </div>
 
         <div className="skills__grid">
-          {grouped.map(({ cat, items }, gi) => (
+          {grouped.map(({ cat, items }) => (
             <div key={cat} className="glass-card skills__group">
               <h3 className="skills__cat">
                 <IconCode className="icon-sm" />
