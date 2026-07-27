@@ -256,10 +256,12 @@ function Skills() {
   const [animated, setAnimated] = useState(false)
   const sectionRef = useRef(null)
 
+  useReveal(sectionRef)
+
   useEffect(() => {
     const io = new IntersectionObserver(
       ([e]) => { if (e.isIntersecting) setAnimated(true) },
-      { threshold: 0.2 }
+      { threshold: 0.1 }
     )
     if (sectionRef.current) io.observe(sectionRef.current)
     return () => io.disconnect()
