@@ -280,10 +280,10 @@ function Skills() {
   return (
     <section id="skills" ref={sectionRef}>
       <div className="container">
-        <p className="section-label reveal">What I work with</p>
-        <h2 className="section-title reveal reveal-delay-1">Skills</h2>
+        <p className="section-label">What I work with</p>
+        <h2 className="section-title">Skills</h2>
 
-        <div className="skills__tabs reveal reveal-delay-1" role="tablist" aria-label="Skill categories">
+        <div className="skills__tabs" role="tablist" aria-label="Skill categories">
           {tabs.map((t) => (
             <button
               key={t}
@@ -299,7 +299,7 @@ function Skills() {
 
         <div className="skills__grid">
           {grouped.map(({ cat, items }, gi) => (
-            <div key={cat} className={`glass-card skills__group reveal reveal-delay-${Math.min(gi + 1, 3)}`}>
+            <div key={cat} className="glass-card skills__group">
               <h3 className="skills__cat">
                 <IconCode className="icon-sm" />
                 {cat}
